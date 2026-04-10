@@ -736,8 +736,13 @@ async function validateAndExpireAppointments() {
 // Kick off auto-expiry logic
 setTimeout(validateAndExpireAppointments, 2000);
 
-window.downloadAppointmentPDF = function() {
-  generatePDF(currentBooking);
+// Specifically for the "Appointment Confirmed" page newly created booking
+window.downloadPDF = function() {
+  if (currentBooking) {
+    generatePDF(currentBooking);
+  } else {
+    showToast('No booking found', 'error');
+  }
 };
 window.renderAppointments = function(type) {
   const containerId = type === 'current' ? 'current-appointments-list' : 'previous-appointments-list';
