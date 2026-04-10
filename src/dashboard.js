@@ -239,17 +239,15 @@ async function loadDoctorsTable() {
       const tr = document.createElement('tr');
       const isLeave = Number(doc.onLeave) === 1;
       tr.innerHTML = `
-        <td><strong>${doc.name}</strong><br><small style="color:#64748b">${doc.qual || 'Specialist'}</small></td>
-        <td><span style="background:#eff6ff; color:#2563eb; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem;">${dept}</span></td>
-        <td>${doc.time} <br> <small>Slots: ${Number(doc.maxSlots) || 15}</small></td>
+        <td data-label="Doctor"><strong>${doc.name}</strong><br><small style="color:#64748b">${doc.qual || 'Specialist'}</small></td>
+        <td data-label="Dept"><span style="background:#eff6ff; color:#2563eb; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem;">${dept}</span></td>
+        <td data-label="Time">${doc.time} <br> <small>Slots: ${Number(doc.maxSlots) || 15}</small></td>
         <td>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <button class="btn-sm btn-outline" onclick="openEditDoctorModal(${doc.id})">Edit</button>
-            <button class="btn-sm ${isLeave ? 'btn-danger' : 'btn-success'}" onclick="toggleDoctorLeave(${doc.id}, ${doc.onLeave || 0})">
-              ${isLeave ? 'End Leave' : 'Set Leave'}
-            </button>
-            <button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
-          </div>
+          <button class="btn-sm btn-outline" onclick="openEditDoctorModal(${doc.id})">Edit</button>
+          <button class="btn-sm ${isLeave ? 'btn-danger' : 'btn-success'}" onclick="toggleDoctorLeave(${doc.id}, ${doc.onLeave || 0})">
+            ${isLeave ? 'End Leave' : 'Set Leave'}
+          </button>
+          <button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -362,13 +360,13 @@ async function loadAppointmentsTable(searchTerm = '') {
       statusIcon = '<i data-lucide="check-circle-2" class="status-icon-completed"></i>';
     }
     tr.innerHTML = `
-      <td>${apt.date}</td>
-      <td><strong>${apt.token}</strong></td>
-      <td>${pName}</td>
-      <td>${apt.department}</td>
-      <td>${docName}</td>
-      <td><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
-      <td>
+      <td data-label="Date">${apt.date}</td>
+      <td data-label="Token"><strong>${apt.token}</strong></td>
+      <td data-label="Patient">${pName}</td>
+      <td data-label="Dept">${apt.department}</td>
+      <td data-label="Doctor">${docName}</td>
+      <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
+      <td data-label="Status">
         <div class="status-cell">
           ${statusIcon}
           <span>${status}</span>
@@ -492,11 +490,11 @@ async function loadRecordsTable() {
     const userDisplay = apt.userEmail || apt.userName || 'Guest Walk-in';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${apt.date}</td>
-      <td><strong>${apt.token}</strong></td>
-      <td>${pName}</td>
-      <td>${docName}</td>
-      <td><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
+      <td data-label="Date">${apt.date}</td>
+      <td data-label="Token"><strong>${apt.token}</strong></td>
+      <td data-label="Patient">${pName}</td>
+      <td data-label="Doctor">${docName}</td>
+      <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
       <td>
         <button class="btn-sm btn-outline" onclick="downloadAdminPDF(${apt.id})">
           <i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF
