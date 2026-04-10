@@ -19,8 +19,17 @@ export {
   createUserWithEmailAndPassword
 };
 export async function executeTursoQuery(sql, args = []) {
-  const TURSO_URL = import.meta.env.VITE_TURSO_URL;
+  let TURSO_URL = import.meta.env.VITE_TURSO_URL;
   const TURSO_TOKEN = import.meta.env.VITE_TURSO_TOKEN;
+
+  // Auto-fix URL formatting for the user
+  if (TURSO_URL) {
+    TURSO_URL = TURSO_URL.replace("libsql://", "https://");
+    if (!TURSO_URL.endsWith("/v2/pipeline")) {
+      // Remove trailing slash if present then append pipeline endpoint
+      TURSO_URL = TURSO_URL.replace(/\/$/, "") + "/v2/pipeline";
+    }
+  }
   const formattedArgs = args.map(arg => {
     if (arg === null || arg === undefined) return { type: "null" };
     if (typeof arg === "number") {
