@@ -28,6 +28,11 @@ export async function executeTursoQuery(sql, args = []) {
     }
     return { type: "text", value: arg.toString() };
   });
+  console.log("Executing Turso Query to:", TURSO_URL);
+  if (!TURSO_URL || !TURSO_TOKEN) {
+    console.error("TURSO_URL or TURSO_TOKEN is missing in environment variables!");
+    throw new Error("Missing Turso configuration");
+  }
   const response = await fetch(TURSO_URL, {
     method: "POST",
     headers: {
@@ -41,7 +46,15 @@ export async function executeTursoQuery(sql, args = []) {
       ]
     })
   });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Turso HTTP Error ${response.status}:`, errorText);
+    throw new Error(`Turso HTTP Error: ${response.status}`);
+  }
+
   const data = await response.json();
+  console.log("Turso Response Data:", data);
   if (data.results && data.results[0] && data.results[0].type === "ok") {
     const result = data.results[0].response.result;
     let rows = [];
