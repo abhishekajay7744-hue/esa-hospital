@@ -479,6 +479,14 @@ body {
 }
 
 @media (max-width: 768px) {
+  html, body {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: relative;
+  }
+  .screen.active { display: block; height: auto; }
 
   /* ---- Sidebar ---- */
   .sidebar-toggle { display: block; }
@@ -497,13 +505,14 @@ body {
     margin-left: 0;
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
+    /* Remove internal scroll constraints */
+    overflow: visible;
+    height: auto;
+    min-height: 100vh;
   }
   .content-area {
     padding: 0.75rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
   }
 
   /* ---- Topbar ---- */
