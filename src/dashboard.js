@@ -107,7 +107,7 @@ function showDashboard() {
 
   // Setup periodic refresh for real-time app connection
   if (!window.dashboardSyncInterval) {
-    window.dashboardSyncInterval = setInterval(refreshAllData, 3000); // 3s fast sync
+    window.dashboardSyncInterval = setInterval(refreshAllData, 10000); // 10s sync
   }
 }
 document.querySelectorAll('.nav-item[data-target]').forEach(item => {
@@ -284,9 +284,7 @@ window.deleteDoctor = async function(id) {
   if(confirm('Are you sure you want to delete this doctor?')) {
     try {
       await executeTursoQuery("DELETE FROM doctors WHERE id = ?", [id]);
-      const oldScroll = window.scrollY;
       await refreshAllData();
-      window.scrollTo(0, oldScroll);
     } catch (err) {
       console.error("Failed to delete doctor", err);
     }
@@ -296,9 +294,7 @@ window.toggleDoctorLeave = async function(id, currentStatus) {
   try {
     const newStatus = Number(currentStatus) === 1 ? 0 : 1;
     await executeTursoQuery("UPDATE doctors SET onLeave = ? WHERE id = ?", [newStatus, id]);
-    const oldScroll = window.scrollY;
     await refreshAllData();
-    window.scrollTo(0, oldScroll);
   } catch (err) {
     console.error("Failed to toggle leave", err);
   }
