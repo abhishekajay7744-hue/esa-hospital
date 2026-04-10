@@ -69,6 +69,16 @@ async function initDb() {
   }
 }
 initDb();
+
+// Toggle Add Doctor form visibility (collapsed by default for mobile)
+window.toggleAddDoctorForm = function() {
+  const wrapper = document.getElementById('add-doctor-form-wrapper');
+  const icon = document.getElementById('add-doctor-toggle-icon');
+  const isVisible = wrapper.style.display !== 'none';
+  wrapper.style.display = isVisible ? 'none' : 'block';
+  icon.textContent = isVisible ? '＋' : '－';
+};
+
 const loginForm = document.getElementById('login-form');
 loginForm.addEventListener('submit', (e) => {
   e.preventDefault();
