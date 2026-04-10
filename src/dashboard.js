@@ -97,7 +97,7 @@ function showDashboard() {
 
   // Setup periodic refresh for real-time app connection
   if (!window.dashboardSyncInterval) {
-    window.dashboardSyncInterval = setInterval(refreshAllData, 10000); // 10s fast sync
+    window.dashboardSyncInterval = setInterval(refreshAllData, 3000); // 3s fast sync
   }
 }
 document.querySelectorAll('.nav-item[data-target]').forEach(item => {

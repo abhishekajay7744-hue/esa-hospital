@@ -491,9 +491,12 @@ body {
   .main-content {
     margin-left: 0;
     width: 100vw;
+    max-width: 100vw;
   }
   .content-area {
     padding: 1rem 0.5rem;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   .inline-form {
     grid-template-columns: 1fr;
