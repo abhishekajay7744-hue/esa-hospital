@@ -242,27 +242,28 @@ async function loadOverview() {
 }
 async function loadDoctorsTable() {
   const tbody = document.getElementById('doctors-table-body');
-  tbody.innerHTML = '';
   const docs = await getDoctors();
+  let html = '';
   for (const dept in docs) {
     docs[dept].forEach((doc) => {
-      const tr = document.createElement('tr');
       const isLeave = Number(doc.onLeave) === 1;
-      tr.innerHTML = `
-        <td data-label="Doctor"><strong>${doc.name}</strong><br><small style="color:#64748b">${doc.qual || 'Specialist'}</small></td>
-        <td data-label="Dept"><span style="background:#eff6ff; color:#2563eb; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem;">${dept}</span></td>
-        <td data-label="Time">${doc.time} <br> <small>Slots: ${Number(doc.maxSlots) || 15}</small></td>
-        <td>
-          <button class="btn-sm btn-outline" onclick="openEditDoctorModal(${doc.id})">Edit</button>
-          <button class="btn-sm ${isLeave ? 'btn-danger' : 'btn-success'}" onclick="toggleDoctorLeave(${doc.id}, ${doc.onLeave || 0})">
-            ${isLeave ? 'End Leave' : 'Set Leave'}
-          </button>
-          <button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
-        </td>
+      html += `
+        <tr>
+          <td data-label="Doctor"><strong>${doc.name}</strong><br><small style="color:#64748b">${doc.qual || 'Specialist'}</small></td>
+          <td data-label="Dept"><span style="background:#eff6ff; color:#2563eb; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem;">${dept}</span></td>
+          <td data-label="Time">${doc.time} <br> <small>Slots: ${Number(doc.maxSlots) || 15}</small></td>
+          <td>
+            <button class="btn-sm btn-outline" onclick="openEditDoctorModal(${doc.id})">Edit</button>
+            <button class="btn-sm ${isLeave ? 'btn-danger' : 'btn-success'}" onclick="toggleDoctorLeave(${doc.id}, ${doc.onLeave || 0})">
+              ${isLeave ? 'End Leave' : 'Set Leave'}
+            </button>
+            <button class="btn-sm btn-danger" onclick="deleteDoctor(${doc.id})"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
+          </td>
+        </tr>
       `;
-      tbody.appendChild(tr);
     });
   }
+  tbody.innerHTML = html;
   lucide.createIcons();
 }
 document.getElementById('add-doctor-form').addEventListener('submit', async (e) => {
@@ -341,7 +342,6 @@ document.getElementById('edit-doctor-form').addEventListener('submit', async (e)
 });
 async function loadAppointmentsTable(searchTerm = '') {
   const tbody = document.getElementById('appointments-table-body');
-  tbody.innerHTML = '';
   let apts = await getAppointments();
   if (searchTerm) {
     apts = apts.filter(a => {
@@ -350,11 +350,9 @@ async function loadAppointmentsTable(searchTerm = '') {
     });
   }
   const todayStr = new Date().toLocaleDateString();
+  let html = '';
   apts.forEach((apt, index) => {
-    const tr = document.createElement('tr');
-    if (apt.date === todayStr) {
-      tr.classList.add('highlight-today');
-    }
+    const highlightClass = apt.date === todayStr ? 'highlight-today' : '';
     const pName = apt.patient ? apt.patient.name : apt.patientName;
     const docName = apt.doctor && typeof apt.doctor === 'object' ? apt.doctor.name : apt.doctorName || apt.doctor;
     const status = apt.status || 'Active';
@@ -365,27 +363,29 @@ async function loadAppointmentsTable(searchTerm = '') {
     } else if (status === 'Completed') {
       statusIcon = '<i data-lucide="check-circle-2" class="status-icon-completed"></i>';
     }
-    tr.innerHTML = `
-      <td data-label="Date">${apt.date}</td>
-      <td data-label="Token"><strong>${apt.token}</strong></td>
-      <td data-label="Patient">${pName}</td>
-      <td data-label="Dept">${apt.department}</td>
-      <td data-label="Doctor">${docName}</td>
-      <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
-      <td data-label="Status">
-        <div class="status-cell">
-          ${statusIcon}
-          <span>${status}</span>
-        </div>
-      </td>
-      <td>
-        <button class="btn-sm btn-outline" onclick="viewAppointmentDetails(${apt.id})">
-          <i data-lucide="eye" style="width:14px; height:14px;"></i> View
-        </button>
-      </td>
+    html += `
+      <tr class="${highlightClass}">
+        <td data-label="Date">${apt.date}</td>
+        <td data-label="Token"><strong>${apt.token}</strong></td>
+        <td data-label="Patient">${pName}</td>
+        <td data-label="Dept">${apt.department}</td>
+        <td data-label="Doctor">${docName}</td>
+        <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
+        <td data-label="Status">
+          <div class="status-cell">
+            ${statusIcon}
+            <span>${status}</span>
+          </div>
+        </td>
+        <td>
+          <button class="btn-sm btn-outline" onclick="viewAppointmentDetails(${apt.id})">
+            <i data-lucide="eye" style="width:14px; height:14px;"></i> View
+          </button>
+        </td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
+  tbody.innerHTML = html;
   lucide.createIcons();
 }
 window.viewAppointmentDetails = async function(id) {
@@ -488,27 +488,28 @@ document.getElementById('search-appointments').addEventListener('input', (e) => 
 });
 async function loadRecordsTable() {
   const tbody = document.getElementById('records-table-body');
-  tbody.innerHTML = '';
   const apts = await getAppointments();
+  let html = '';
   apts.forEach((apt) => {
     const pName = apt.patient ? apt.patient.name : apt.patientName;
     const docName = apt.doctor && typeof apt.doctor === 'object' ? apt.doctor.name : apt.doctorName || apt.doctor;
     const userDisplay = apt.userEmail || apt.userName || 'Guest Walk-in';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td data-label="Date">${apt.date}</td>
-      <td data-label="Token"><strong>${apt.token}</strong></td>
-      <td data-label="Patient">${pName}</td>
-      <td data-label="Doctor">${docName}</td>
-      <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
-      <td>
-        <button class="btn-sm btn-outline" onclick="downloadAdminPDF(${apt.id})">
-          <i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF
-        </button>
-      </td>
+    html += `
+      <tr>
+        <td data-label="Date">${apt.date}</td>
+        <td data-label="Token"><strong>${apt.token}</strong></td>
+        <td data-label="Patient">${pName}</td>
+        <td data-label="Doctor">${docName}</td>
+        <td data-label="By"><span style="font-size: 0.85rem; color: #64748b;">${userDisplay}</span></td>
+        <td>
+          <button class="btn-sm btn-outline" onclick="downloadAdminPDF(${apt.id})">
+            <i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF
+          </button>
+        </td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
+  tbody.innerHTML = html;
   lucide.createIcons();
 }
 window.downloadAdminPDF = async function(id) {
