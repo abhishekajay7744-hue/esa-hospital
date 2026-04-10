@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - ESA Hospital</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/dashboard.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="login-screen" class="screen active">
+    <div class="login-card">
+      <div class="login-header">
+        <i data-lucide="shield-check"></i>
+        <h2>Admin Access</h2>
+        <p>ESA Hospital, Kottayam</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <p id="login-error" class="error-msg"></p>
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" class="screen">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <i data-lucide="activity"></i>
+        <span>ESA Admin</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-target="view-overview"><i data-lucide="layout-dashboard"></i> Overview</a>
+        <a href="#" class="nav-item" data-target="view-doctors"><i data-lucide="users"></i> Manage Doctors</a>
+        <a href="#" class="nav-item" data-target="view-appointments"><i data-lucide="calendar"></i> Appointments</a>
+        <a href="#" class="nav-item" data-target="view-records"><i data-lucide="file-text"></i> PDF Records</a>
+        <a href="#" class="nav-item text-danger" id="logout-btn"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button id="sidebar-toggle" class="sidebar-toggle"><i data-lucide="menu"></i></button>
+        <h2 id="page-title">Dashboard Overview</h2>
+        <div class="admin-profile">
+          <div class="avatar"><i data-lucide="user"></i></div>
+          <span>Admin</span>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <div id="view-overview" class="view active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i data-lucide="users"></i></div>
+              <div class="stat-details">
+                <h3>Total Doctors</h3>
+                <p id="stat-doctors">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i data-lucide="calendar-check"></i></div>
+              <div class="stat-details">
+                <h3>Total Appointments</h3>
+                <p id="stat-appointments">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i data-lucide="clock"></i></div>
+              <div class="stat-details">
+                <h3>Today's Appointments</h3>
+                <p id="stat-today">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-doctors" class="view">
+          <div class="card">
+            <div class="card-header">
+              <h3>Add New Doctor</h3>
+            </div>
+            <div class="card-body">
+              <form id="add-doctor-form" class="inline-form">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" id="doc-name" placeholder="Dr. Name" required>
+                </div>
+                <div class="form-group">
+                  <label>Qualifications & Details</label>
+                  <input type="text" id="doc-qual" placeholder="e.g. MBBS, MD, DM (Neurology)" required>
+                </div>
+                <div class="form-group">
+                  <label>Department</label>
+                  <select id="doc-dept" required>
+                    <option value="NEUROLOGY">Neurology</option>
+                    <option value="ENT">ENT</option>
+                    <option value="UROLOGY">Urology</option>
+                    <option value="PEDIATRICS">Pediatrics</option>
+                    <option value="GYNAECOLOGY">Gynaecology</option>
+                    <option value="GENERAL MEDICINE">General Medicine</option>
+                    <option value="ORTHO">Ortho</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Time Slot</label>
+                  <input type="text" id="doc-time" placeholder="e.g. 10:00 AM - 1:00 PM" required>
+                </div>
+                <div class="form-group">
+                  <label>Daily Slots</label>
+                  <input type="number" id="doc-slots" value="15" min="1" required>
+                </div>
+                <div class="form-group form-group-submit">
+                  <button type="submit" class="btn-primary">Add Doctor</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div class="card-header">
+              <h3>Doctor List</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Department</th>
+                      <th>Time Slot</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="doctors-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-appointments" class="view">
+          <div class="card">
+            <div class="card-header flex-between">
+              <h3>All Appointments</h3>
+              <input type="text" id="search-appointments" placeholder="Search patient..." class="search-input">
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Token</th>
+                      <th>Patient Name</th>
+                      <th>Department</th>
+                      <th>Doctor</th>
+                      <th>Registered By</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="appointments-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-records" class="view">
+          <div class="card">
+            <div class="card-header">
+              <h3>PDF Records</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Token</th>
+                      <th>Patient Name</th>
+                      <th>Doctor</th>
+                      <th>Registered By</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="records-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="edit-doctor-modal" class="modal-overlay">
+    <div class="modal-content card">
+      <div class="card-header flex-between">
+        <h3>Edit Doctor</h3>
+        <button class="close-btn" onclick="closeEditDoctorModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="card-body">
+        <form id="edit-doctor-form">
+          <input type="hidden" id="edit-doc-dept-orig">
+          <input type="hidden" id="edit-doc-index">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="edit-doc-name" required>
+          </div>
+          <div class="form-group">
+            <label>Qualifications & Details</label>
+            <input type="text" id="edit-doc-qual" required>
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <select id="edit-doc-dept" required>
+              <option value="NEUROLOGY">Neurology</option>
+              <option value="ENT">ENT</option>
+              <option value="UROLOGY">Urology</option>
+              <option value="PEDIATRICS">Pediatrics</option>
+              <option value="GYNAECOLOGY">Gynaecology</option>
+              <option value="GENERAL MEDICINE">General Medicine</option>
+              <option value="ORTHO">Ortho</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Time Slot</label>
+            <input type="text" id="edit-doc-time" required>
+          </div>
+          <div class="form-group">
+            <label>Daily Slots</label>
+            <input type="number" id="edit-doc-slots" required>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-appointment-modal" class="modal-overlay">
+    <div class="modal-content card modal-lg">
+      <div class="card-header flex-between">
+        <h3>Appointment Details</h3>
+        <button class="close-btn" onclick="closeViewAppointmentModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="card-body" id="appointment-details-content">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script type="module" src="/src/dashboard.js"></script>
+</body>
+</html>
