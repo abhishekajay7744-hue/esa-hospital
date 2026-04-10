@@ -282,7 +282,7 @@ document.getElementById('add-doctor-form').addEventListener('submit', async (e) 
   }
 });
 window.deleteDoctor = async function(id) {
-  if(confirm('Are you sure you want to delete this doctor?')) {
+  if (confirm('⚠️ Are you sure you want to completely remove this doctor from the hospital system? This action cannot be undone.')) {
     try {
       await executeTursoQuery("DELETE FROM doctors WHERE id = ?", [id]);
       await refreshAllData();
@@ -292,12 +292,20 @@ window.deleteDoctor = async function(id) {
   }
 };
 window.toggleDoctorLeave = async function(id, currentStatus) {
-  try {
-    const newStatus = Number(currentStatus) === 1 ? 0 : 1;
-    await executeTursoQuery("UPDATE doctors SET onLeave = ? WHERE id = ?", [newStatus, id]);
-    await refreshAllData();
-  } catch (err) {
-    console.error("Failed to toggle leave", err);
+  const isSettingLeave = Number(currentStatus) === 0;
+  const msg = isSettingLeave 
+    ? '🛑 Are you sure you want to mark this doctor as ON LEAVE? They will not be available for new appointments.'
+    : '✅ Are you sure you want to END LEAVE for this doctor? They will be available for appointments again.';
+    
+  if (confirm(msg)) {
+    try {
+      const newStatus = Number(currentStatus) === 1 ? 0 : 1;
+      await executeTursoQuery("UPDATE doctors SET onLeave = ? WHERE id = ?", [newStatus, id]);
+      await refreshAllData();
+    } catch (err) {
+      console.error("Failed to toggle leave", err);
+      alert("Failed to update leave status. Please try again.");
+    }
   }
 };
 window.openEditDoctorModal = async function(id) {
@@ -326,6 +334,11 @@ window.closeEditDoctorModal = function() {
 };
 document.getElementById('edit-doctor-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  if (!confirm('💾 Are you sure you want to apply these edits and change the daily slot limits for this doctor?')) {
+    return;
+  }
+  
   const id = document.getElementById('edit-doc-index').value;
   const newName = document.getElementById('edit-doc-name').value;
   const newQual = document.getElementById('edit-doc-qual').value;
@@ -338,6 +351,7 @@ document.getElementById('edit-doctor-form').addEventListener('submit', async (e)
     closeEditDoctorModal();
   } catch (err) {
     console.error("Failed to edit doctor", err);
+    alert("Failed to save changes. Please try again.");
   }
 });
 async function loadAppointmentsTable(searchTerm = '') {
